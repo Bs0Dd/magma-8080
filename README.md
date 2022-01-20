@@ -56,3 +56,10 @@ Examples using a set of routines (at **7000h**):
  * **magma-ld-86rk** [(.asm)](https://github.com/Bs0Dd/magma-8080/blob/main/magma-ld-86rk.asm) [(.rk)](https://github.com/Bs0Dd/magma-8080/blob/main/magma-ld-86rk.rk) - Version for PC **Radio-86RK** (with display of values)  
  * **magma-ld-uni** [(.asm)](https://github.com/Bs0Dd/magma-8080/blob/main/magma-ld-uni.asm) [(.bin)](https://github.com/Bs0Dd/magma-8080/blob/main/magma-ld-uni.bin) - Not tied to a specific device version (**HLT** after the end of the program)
 
+Examples of crypting program (**Magma-Crypto**):  
+ * **magma-crypto-86rk** [(.asm)](https://github.com/Bs0Dd/magma-8080/blob/main/magma-crypto-86rk.asm) [(.rk)](https://github.com/Bs0Dd/magma-8080/blob/main/magma-crypto-86rk.rk) - Version for PC **Radio-86RK** (with display)  
+ * **magma-crypto-uni** [(.asm)](https://github.com/Bs0Dd/magma-8080/blob/main/magma-crypto-uni.asm) [(.bin)](https://github.com/Bs0Dd/magma-8080/blob/main/magma-crypto-uni.bin) - Not tied to a specific device version (**HLT** after the end of the program)
+ 
+## References
+
+The programs are based on material from [this](https://spy-soft.net/magma-encryption/) article.

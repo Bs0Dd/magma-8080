@@ -55,4 +55,11 @@
 Примеры с использованием набора подпрограмм (по адресу **7000h**):  
  * **magma-ld-86rk** [(.asm)](https://github.com/Bs0Dd/magma-8080/blob/main/magma-ld-86rk.asm) [(.rk)](https://github.com/Bs0Dd/magma-8080/blob/main/magma-ld-86rk.rk) - Версия для ПЭВМ **Радио-86РК** (с выводом значений на дисплей)  
  * **magma-ld-uni** [(.asm)](https://github.com/Bs0Dd/magma-8080/blob/main/magma-ld-uni.asm) [(.bin)](https://github.com/Bs0Dd/magma-8080/blob/main/magma-ld-uni.bin) - Не привязанная к конкретному устройству версия (**HLT** после конца программы)
- 
+
+Примеры шифрующей программы (**Магма-Крипто**):  
+* **magma-crypto-86rk** [(.asm)](https://github.com/Bs0Dd/magma-8080/blob/main/magma-crypto-86rk.asm) [(.rk)](https://github.com/Bs0Dd/magma-8080/blob/main/magma-crypto-86rk.rk) - Версия для ПЭВМ **Радио-86РК** (с выводом на дисплей)  
+* **magma-crypto-uni** [(.asm)](https://github.com/Bs0Dd/magma-8080/blob/main/magma-crypto-uni.asm) [(.bin)](https://github.com/Bs0Dd/magma-8080/blob/main/magma-crypto-uni.bin) - Не привязанная к конкретному устройству версия (**HLT** после конца программы)
+
+## Используемая литература
+
+Программы основаны на материале [этой](https://spy-soft.net/magma-encryption/) статьи.
