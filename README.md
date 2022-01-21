@@ -7,6 +7,8 @@ Encryption algorithm implementation for Intel 8080A processor.
 
 * [Electronic Codebook mode (ECB)](https://github.com/Bs0Dd/magma-8080/blob/main/ECB/README.md) / [Режим простой замены (ECB)](https://github.com/Bs0Dd/magma-8080/blob/main/ECB/README-ru_RU.md)
 * [Counter mode (CTR)](https://github.com/Bs0Dd/magma-8080/blob/main/CTR/README.md) / [Режим гаммирования (CTR)](https://github.com/Bs0Dd/magma-8080/blob/main/CTR/README-ru_RU.md)
+* Cipher Feedback mode (CFB) / Режим гаммирования с обратной связью (CFB) - Coming soon
+* Message Authentication Code mode (MAC) / Режим выработки имитовставки (MAC) - Coming soon
  
 ## References / Используемая литература
 
