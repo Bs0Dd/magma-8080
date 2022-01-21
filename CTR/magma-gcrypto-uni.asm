@@ -1,16 +1,16 @@
-        ; KR580VM80A (i8080A) assembly code for Radio-86RK (32kb)
+        ; KR580VM80A (i8080A) assembly code
 
 ; /-----------------------------------------------\
 ; | ГОСТ 28147-89 "Магма" | GOST 28147-89 "Magma" |
 ; |                       |                       |
-; | Режим простой замены  |        ECB mode       |
+; |  Режим гаммирования   |        CTR mode       |
 ; |                       |                       |
 ; | Реализация алгоритма  |  Algorithm implement. |
 ; |    для процессора     |     for processor     |
 ; |      КР580ВМ80А       |      Intel 8080A      |
 ; |                       |                       |
-; |     Магма-Крипто      |      Magma-Crypto     |
-; |      Универсал        |        Universal      |
+; |     Магма-гКрипто     |      Magma-gCrypto    |
+; |       Универсал       |        Universal      |
 ; \-----------------------------------------------/
 
         org 0
@@ -21,43 +21,47 @@
 
         lxi de, text ; Адрес начала текста | Text start address
 
-        mvi b, 0     ; Режим работы:                      | Operation mode:
-                     ; 0 - шифрование, иначе дешифрование | 0 - encryption, otherwise decryption
-
         lxi hl, 128  ; Количество блоков для шифрования (8 б) | number of blocks to encrypt (8 b)
 
 ;----------------------------------------------------
 ;       ********************************************
 ;----------------------------------------------------
-
-        push bc
+	
         push hl
+        push de
 
 ;----------------------------------------------------
 
-start:  ; Запуск шифрования/дешифрования | Start encryption/decryption
+prepvi: ; Подготовка Инициализирующего Вектора | Preparing the Initializing Vector
+        lxi hl, binvc
+        lxi de, inivc
+        mvi c, 8
+	
+psyvil:
+        ldax de
+        mov m, a
+        inx de
+        inx hl
+        dcr c
+        jnz psyvil
 
-	xra a
-        cmp b
-        jz encmod
+        pop de
 
-        lxi bc, 0FF00h ; Параметры для режима: | Parameters for the mode:
-        mvi a, 32      ; дешифрование          | decryption
-        jmp next
+;----------------------------------------------------
 
+start:  ; Запуск алгоритма | Running the algorithm
+        lxi bc, 0121h
+        mvi a, 1
 
-encmod:
-        lxi bc, 0121h  ; Параметры для режима: | Parameters for the mode:
-        mvi a, 1       ; шифрование            | encryption
-
-next:
+next: 
         push de
         push bc
         push psw
         mvi b, 8
-        lxi hl, data
+        lxi hl, enciv
+        lxi de, binvc
 
-dmove:  ; Перенос блока текста в "рабочую" зону | Moving a block of text to the "working" area
+dmove:  ; Перенос вектора в "рабочую" зону | Moving a vector to the "working" area
         ldax de
         inx de
         mov m, a
@@ -69,7 +73,7 @@ dmove:  ; Перенос блока текста в "рабочую" зону | 
 
 drtobf: ; Перенос правого блока в буфер | Move the right block to the buffer
         lxi hl, buf
-        lxi de, data+4
+        lxi de, enciv+4
         mvi c, 4
         mov b, a
 drloop:
@@ -211,16 +215,9 @@ skipcr:
 
 2add:   ; Сложение по модулю 2 (XOR) | Addition by mod 2 (XOR)
         lxi hl, buf
-        lxi de, data
+        lxi de, enciv
         mvi c, 4
-2loop:
-        ldax de
-        inx de
-        xra m
-        mov m, a
-        inx hl
-        dcr c
-        jnz 2loop
+        call 2addf
 
 ;----------------------------------------------------
 
@@ -236,23 +233,33 @@ skipcr:
         jnz mainlp
 
         pop bc
-        pop de
+	
+;----------------------------------------------------	
 
-        lxi hl, data
-        mvi b, 8
-
-drmove: ; Перенос блока обратно в текст | Moving block back to text
-        mov a, m
-        inx hl
-        stax de
-        inx de
-        dcr b
-        jnz drmove
-
+2addrs: ; Сложение по модулю 2 (XOR) с данными | Addition by mod 2 (XOR) with data
+        lxi de, enciv
         pop hl
-	pop bc
+        mvi c, 8
+        call 2addf
+        xchg
+
+;--------------------------
+
+incriv: ; Инкремент счетчика ИВ | Initializing Vector counter increment
+        lxi hl, binvc+8
+        mvi c, 9
+inclp:
+        dcr c
+        jz chkend
         dcx hl
-	push bc
+        inr m
+        jz inclp
+
+;----------------------------------------------------
+
+chkend:
+        pop hl
+        dcx hl
         push hl
         xra a
         cmp h
@@ -264,8 +271,20 @@ drmove: ; Перенос блока обратно в текст | Moving block 
 
 ;----------------------------------------------------
 
+2addf:  ; Функция сложения по модулю 2 (XOR) | Addition by mod 2 (XOR) function
+        ldax de
+        inx de
+        xra m
+        mov m, a
+        inx hl
+        dcr c
+        jnz 2addf
+        ret
+
+;--------------------------
+
 swap32: ; Перенос блоков для раунда 32 | Swapping blocks for round 32
-        lxi hl, data
+        lxi hl, enciv
         lxi de, buf
         mvi c, 4
         mov b, a
@@ -273,11 +292,11 @@ swap32: ; Перенос блоков для раунда 32 | Swapping blocks f
 
 
 swap:   ; Перенос блоков | Swapping blocks
-        lxi hl, data
-        lxi de, data+4
+        lxi hl, enciv
+        lxi de, enciv+4
         mvi c, 4
         call doswap
-        lxi hl, data+4
+        lxi hl, enciv+4
         lxi de, buf
         mvi c, 4
 
@@ -326,6 +345,12 @@ fdloph:
 buf:    ; Буфер | Buffer
         db 0, 0, 0, 0
 
+enciv:  ; Буфер шифрования ИВ | Initialization Vector encryption buffer
+        db 0, 0, 0, 0, 0, 0, 0, 0
+
+binvc:  ; Буфер Инициализирующего Вектора | Initializing Vector buffer
+        db 0, 0, 0, 0, 0, 0, 0, 0
+
 pitab:  ; Таблица перестановок (S-блоки) | Permutation table (S-blocks)
         db 1, 7, 14, 13, 0, 5, 8, 3, 4, 15, 10, 6, 9, 12, 11, 2
         db 8, 14, 2, 5, 6, 9, 1, 12, 15, 4, 11, 0, 13, 10, 3, 7
@@ -341,10 +366,10 @@ key:    ; Ключ для шифрования | Encryption key
         db 13h, 14h, 15h, 16h, 17h, 18h, 19h, 20h, 21h, 22h
         db 23h, 24h, 25h, 26h, 27h, 28h, 29h, 30h, 31h, 32h
 
-data:   ; Шифруемые/дешифруемые данные | Data for encryption/decryption
-        db 0, 0, 0, 0, 0, 0, 0, 0
+inivc:  ; Инициализирующий Вектор | Initializing Vector
+        db 12h, 34h, 56h, 78h, 0, 0, 0, 0
 
 ;----------------------------------------------------
 
 text:	; Шифруемый/дешифруемый текст | Text for encryption/decryption
-	db 'lobortis id euismod in, elementum vitae elit. Duis id ipsum ac turpis porta consequat. Vestibulum eget odio non nisl posuere placerat eget ut leo. Donec convallis aliquet varius. Proin eu faucibus magna, vel sodales magna. Maecenas euismod, felis vel hendrerit vehicula, dolor urna posuere quam, eu auctor metus ante sit amet dolor. Sed eget lectus felis. Cras congue dignissim vestibulum. Nullam sed odio nibh. Phasellus in est enim. Praesent dui ex, placerat vitae nibh non, rutrum efficitur orci. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tellus diam, gravida quis mi sed, luctus aliquam neque. Praesent lacinia suscipit sapien, eu malesuada nunc ullamcorper eu. Aenean ac risus ornare purus feugiat pulvinar. Suspendisse ac ipsum nulla. Morbi lacinia elit quis leo mattis, a vestibulum turpis efficitur. Maecenas sed felis congue, varius metus id tortor. Praesent lacinia suscipit sapien, eu malesuada nunc ullamcorper eu. Aenean ac risus ornare purus feugiat pulvinar. Morbi lacinia elit qu.'
+        db 'lobortis id euismod in, elementum vitae elit. Duis id ipsum ac turpis porta consequat. Vestibulum eget odio non nisl posuere placerat eget ut leo. Donec convallis aliquet varius. Proin eu faucibus magna, vel sodales magna. Maecenas euismod, felis vel hendrerit vehicula, dolor urna posuere quam, eu auctor metus ante sit amet dolor. Sed eget lectus felis. Cras congue dignissim vestibulum. Nullam sed odio nibh. Phasellus in est enim. Praesent dui ex, placerat vitae nibh non, rutrum efficitur orci. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tellus diam, gravida quis mi sed, luctus aliquam neque. Praesent lacinia suscipit sapien, eu malesuada nunc ullamcorper eu. Aenean ac risus ornare purus feugiat pulvinar. Suspendisse ac ipsum nulla. Morbi lacinia elit quis leo mattis, a vestibulum turpis efficitur. Maecenas sed felis congue, varius metus id tortor. Praesent lacinia suscipit sapien, eu malesuada nunc ullamcorper eu. Aenean ac risus ornare purus feugiat pulvinar. Morbi lacinia elit qu.'

@@ -1,4 +1,4 @@
-        ; KR580VM80A (i8080A) assembly code for Radio-86RK (32kb)
+        ; KR580VM80A (i8080A) assembly code
 
 ; /-----------------------------------------------\
 ; | ГОСТ 28147-89 "Магма" | GOST 28147-89 "Magma" |
@@ -10,13 +10,8 @@
 ; |      КР580ВМ80А       |      Intel 8080A      |
 ; |                       |                       |
 ; |     Магма-Крипто      |      Magma-Crypto     |
-; |      Радио-86РК       |       Radio-86RK      |
+; |      Универсал        |        Universal      |
 ; \-----------------------------------------------/
-
-exit    equ 0F86Ch
-setch   equ 0F809h
-sethex  equ 0F815h
-print   equ 0F818h
 
         org 0
 
@@ -37,21 +32,6 @@ print   equ 0F818h
 
         push bc
         push hl
-
-        lxi hl, title
-        call print
-
-        cmp b
-        jz encp
-
-        lxi hl, decr
-        jmp tprint
-
-encp:
-        lxi hl, encr
-
-tprint:
-        call print
 
 ;----------------------------------------------------
 
@@ -280,10 +260,7 @@ drmove: ; Перенос блока обратно в текст | Moving block 
         cmp l
         jnz start
 
-        lxi hl, done
-        call print
-
-        jmp exit ; Конец программы | End of the program
+        hlt ; Конец программы | End of the program
 
 ;----------------------------------------------------
 
@@ -343,19 +320,6 @@ fdloph:
         mov e, a
         dad de
         ret
-
-;----------------------------------------------------
-
-title:
-        db 1fh,'magma-kripto',0dh,0ah,0
-
-decr:
-        db 'de'
-encr:
-        db '{ifrowanie...',0
-
-done:
-        db ' gotowo!',0dh,0ah,0
 
 ;----------------------------------------------------
 
