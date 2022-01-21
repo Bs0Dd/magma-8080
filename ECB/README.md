@@ -2,8 +2,6 @@ English | [Русский](https://github.com/Bs0Dd/magma-8080/blob/main/ECB/REA
 
 # Magma - Electronic Codebook mode (ECB)
 
-![Title](https://raw.githubusercontent.com/Bs0Dd/magma-8080/main/86rk.png)
-
 Electronic Codebook mode implementation for Intel 8080A processor.
 
 * Encryption/decryption in blocks of **64 bits**.

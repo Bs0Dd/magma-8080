@@ -2,8 +2,6 @@ English | [Русский](https://github.com/Bs0Dd/magma-8080/blob/main/CTR/REA
 
 # Magma - Counter mode (CTR)
 
-![Title](https://raw.githubusercontent.com/Bs0Dd/magma-8080/main/86rk.png)
-
 Counter mode implementation for Intel 8080A processor.
 
 * Encryption/decryption in blocks of **64 bits**.
