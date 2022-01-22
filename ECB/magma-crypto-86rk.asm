@@ -27,7 +27,7 @@ print   equ 0F818h
         mvi b, 0     ; Режим работы:                      | Operation mode:
                      ; 0 - шифрование, иначе дешифрование | 0 - encryption, otherwise decryption
 
-        lxi hl, 128  ; Количество блоков для шифрования (8 б) | number of blocks to encrypt (8 b)
+        lxi hl, 128  ; Количество блоков для обработки (8 б) | Number of blocks to process (8 b)
 
 ;----------------------------------------------------
 ;       ********************************************
