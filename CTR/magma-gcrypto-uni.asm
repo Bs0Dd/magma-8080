@@ -52,12 +52,10 @@ psyvil:
 start:  ; Запуск алгоритма | Running the algorithm
         lxi bc, 0121h
         mvi a, 1
-
-next: 
         push de
         push bc
-        push psw
-        mvi b, 8
+        mov b, a
+        mvi c, 8
         lxi hl, enciv
         lxi de, binvc
 
@@ -66,7 +64,7 @@ dmove:  ; Перенос вектора в "рабочую" зону | Moving a 
         inx de
         mov m, a
         inx hl
-        dcr b
+        dcr c
         jnz dmove
 
 ;--------------------------
@@ -75,7 +73,6 @@ drtobf: ; Перенос правого блока в буфер | Move the righ
         lxi hl, buf
         lxi de, enciv+4
         mvi c, 4
-        mov b, a
 drloop:
         ldax de
         inx de
@@ -84,8 +81,6 @@ drloop:
         dcr c
         jnz drloop
         mov a, b
-
-        pop psw
 
 ;---------------------------
 
