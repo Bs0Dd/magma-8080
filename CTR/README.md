@@ -40,8 +40,6 @@ Files **bin** and **rk** imply loading their code to **7000h**. Accordingly addr
 |   key    |  7214h  |
 |  inivc   |  7234h  |
 
-The encryption/decryption result will always be located at **data**.
-
 
 ## Examples
 
